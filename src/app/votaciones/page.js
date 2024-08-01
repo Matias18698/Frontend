@@ -29,6 +29,14 @@ export default function Home() {
   const [votaciones, setvotaciones] = useState([]);
   const [modalState, setmodalState] = useState(false);
   const [deleteSelected, setdeleteSelected] = useState({});
+  const [session, setSession] = useState(null);
+
+  const getSession = () => {
+    const jsonsession = JSON.parse(sessionStorage.getItem('asamblea-sesion-id'));
+    if (jsonsession) {
+      setSession(jsonsession);
+    }
+  };
 
   const getvotaciones = async () => {
     await axios.get(`${process.env.NEXT_PUBLIC_SERVIDOR}/votaciones`)
@@ -74,29 +82,58 @@ export default function Home() {
                   <TableCell >{row.descripcion}</TableCell>
                   <TableCell >{row.status}</TableCell>
                   <TableCell >{row.asamblea.titulo_asamblea}</TableCell>
+                  <TableCell >{row.users.length}</TableCell>
                   <TableCell >
                     <Link href={"/votar/"+row._id}>
                       <IconButton aria-label="Votar" color="secondary"  size="large">
                           <HowToVote/>
                       </IconButton> 
                     </Link>
-                    <Link href={"/votaciones/"+row._id}>
-                      <IconButton aria-label="Editar" color="primary" size="large">
-                          <Edit/>
-                      </IconButton> 
-                    </Link>
-                    <IconButton aria-label="Eliminar" color="error" onClick={()=>deleteAks(row)} size="large">
-                        <Delete/>
-                    </IconButton> 
+                    {adminButtons(row)}
                   </TableCell>
               </TableRow>
           )
       }))
   }
 
+  const adminButtons=(row)=>{
+    if(session.rol=='Admin'){
+      return(
+        <>
+          <Link href={"/votaciones/"+row._id}>
+            <IconButton aria-label="Editar" color="primary" size="large">
+                <Edit/>
+            </IconButton> 
+          </Link>
+          <IconButton aria-label="Eliminar" color="error" onClick={()=>deleteAks(row)} size="large">
+              <Delete/>
+          </IconButton> 
+        </>
+      )
+    }
+  }
+
+  const adminButtonAdd=()=>{
+    if(session.rol=='Admin'){
+      return(
+        <TableFooter>
+          <TableRow>
+            <TableCell colSpan={6}>
+              <Link href={"/votaciones/nuevo"}>
+                <Button type="button" variant="contained" startIcon={<Add/>} size="large" color="success">
+                  Nueva Votacion
+                </Button> 
+              </Link>
+            </TableCell>
+          </TableRow>
+        </TableFooter>
+      )
+    }
+  }
+
   useEffect(() => {
       getvotaciones();
-      
+      getSession();
   }, [])
 
   return (
@@ -136,23 +173,14 @@ export default function Home() {
                 <TableCell>Descripción</TableCell>
                 <TableCell>Estado</TableCell>
                 <TableCell>Asamblea</TableCell>
+                <TableCell>Votos realizados</TableCell>
                 <TableCell></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {contentTable()}
             </TableBody>
-            <TableFooter>
-              <TableRow>
-                <TableCell colSpan={6}>
-                  <Link href={"/votaciones/nuevo"}>
-                    <Button type="button" variant="contained" startIcon={<Add/>} size="large" color="success">
-                      Nueva Votacion
-                    </Button> 
-                  </Link>
-                </TableCell>
-              </TableRow>
-            </TableFooter>
+            {adminButtonAdd()}
             </Table>
           </TableContainer>
       </Container>

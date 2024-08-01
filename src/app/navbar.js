@@ -63,6 +63,11 @@ function Navbar({session}) {
     setAnchorElUser(null);
   };
 
+  const handleLogout=()=>{
+    sessionStorage.removeItem("asamblea-sesion-id");
+    window.location.reload();
+  }
+
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
@@ -186,7 +191,7 @@ function Navbar({session}) {
             >
               {settings.map((setting) => (
                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
+                  <Typography textAlign="center" onClick={handleLogout}>{setting}</Typography>
                 </MenuItem>
               ))}
             </Menu>
