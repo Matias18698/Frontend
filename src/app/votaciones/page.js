@@ -97,7 +97,7 @@ export default function Home() {
   }
 
   const adminButtons=(row)=>{
-    if(session.rol=='Admin'){
+    if(session?.rol=='Admin'){
       return(
         <>
           <Link href={"/votaciones/"+row._id}>
@@ -114,7 +114,7 @@ export default function Home() {
   }
 
   const adminButtonAdd=()=>{
-    if(session.rol=='Admin'){
+    if(session?.rol=='Admin'){
       return(
         <TableFooter>
           <TableRow>
